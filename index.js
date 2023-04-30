@@ -85,20 +85,143 @@ app.post('/rate', (req, res) => {
 
 // read data / get data
 app.get('/rate', (req, res) => {
-    const querySql = 'SELECT * FROM rate ORDER BY createdAt DESC LIMIT 1';
+    const queryViapulsaYesterday = 'SELECT * FROM rate WHERE company = "VIA PULSA" AND DATE(createdAt) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) ORDER BY createdAt DESC LIMIT 1';
+    const queryViapulsaToday = 'SELECT * FROM rate WHERE company = "VIA PULSA" ORDER BY createdAt DESC LIMIT 1';
 
-    koneksi.query(querySql, (err, rows, field) => {
+    const queryBypulsaYesterday = 'SELECT * FROM rate WHERE company = "BY PULSA" AND DATE(createdAt) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) ORDER BY createdAt DESC LIMIT 1';
+    const queryBypulsaToday = 'SELECT * FROM rate WHERE company = "BY PULSA" ORDER BY createdAt DESC LIMIT 1';
+    
+    koneksi.query(queryViapulsaYesterday, (err, rowsViaPulsaYesterday, field) => {
         if (err) {
             return res.status(500).json({ message: 'Ada kesalahan', error: err });
         }
-        const data = rows.map(row => ({
-            ...row,
-            rate: JSON.parse(row.rate)
-        }));
-        res.status(200).json({ success: true, data: data });
+        koneksi.query(queryViapulsaToday, (err, rowsViaPulsaToday, field) => {
+            if (err) {
+                return res.status(500).json({ message: 'Ada kesalahan', error: err });
+            }
+            koneksi.query(queryBypulsaYesterday, (err, rowsByPulsaYesterday, fieldYesterday) => {
+                if (err) {
+                  return res.status(500).json({ message: 'Ada kesalahan', error: err });
+                }
+              
+                koneksi.query(queryBypulsaToday, (err, rowsByPulsaToday, fieldToday) => {
+                  if (err) {
+                    return res.status(500).json({ message: 'Ada kesalahan', error: err });
+                  }
+                  const viapulsaYesterday = rowsViaPulsaYesterday.map(row => ({
+                    ...row,
+                    company: row.company,
+                    rate: JSON.parse(row.rate),
+                    createdAt: new Date(row.createdAt).toLocaleDateString()
+                  }));
+              
+                  const viapulsaToday = rowsViaPulsaToday.map(row => ({
+                    ...row,
+                    company: row.company,
+                    rate: JSON.parse(row.rate),
+                    createdAt: new Date(row.createdAt).toLocaleDateString()
+                  }));
+              
+                  const bypulsaYesterday = rowsByPulsaYesterday.map(row => ({
+                    ...row,
+                    company: row.company,
+                    rate: JSON.parse(row.rate),
+                    createdAt: new Date(row.createdAt).toLocaleDateString()
+                  }));
+              
+                  const bypulsaToday = rowsByPulsaToday.map(row => ({
+                    ...row,
+                    company: row.company,
+                    rate: JSON.parse(row.rate),
+                    createdAt: new Date(row.createdAt).toLocaleDateString()
+                  }));
+                  const viapulsaYesterdayObj = {};
+                  viapulsaYesterday.forEach(obj => {
+                    obj.rate.forEach(rateObj => {
+                      const provider = Object.keys(rateObj)[0];
+                      const rate = rateObj[provider];
+                      viapulsaYesterdayObj[provider] = rate;
+                    });
+                  });
+                  const bypulsaYesterdayObj = {};
+                  bypulsaYesterday.forEach(obj => {
+                    obj.rate.forEach(rateObj => {
+                      const provider = Object.keys(rateObj)[0];
+                      const rate = rateObj[provider];
+                      bypulsaYesterdayObj[provider] = rate;
+                    });
+                  });
+                  const comp = {
+                    viapulsa: viapulsaToday.map(obj => {
+                      const rates = [];
+                      obj.rate.forEach(rateObj => {
+                        const provider = Object.keys(rateObj)[0];
+                        const rateToday = parseFloat(rateObj[provider]);
+                        const rateYesterday = parseFloat(viapulsaYesterdayObj[provider]);
+                        const difference = parseFloat((rateToday - rateYesterday).toFixed(2))
+                        let status = 'same';
+                        if (rateToday > rateYesterday) {
+                          status = 'up';
+                        } else if (rateToday < rateYesterday) {
+                          status = 'down';
+                        }
+                        rates.push({
+                          provider,
+                          rateToday,
+                          rateYesterday,
+                          status,
+                          difference
+                        });
+                      });
+                      return {
+                        company: obj.company,
+                        rates
+                      };
+                    }),
+                    bypulsa: bypulsaToday.map(obj => {
+                      const rates = [];
+                      obj.rate.forEach(rateObj => {
+                        const provider = Object.keys(rateObj)[0];
+                        const rateToday = parseFloat(rateObj[provider]);
+                        const rateYesterday = parseFloat(bypulsaYesterdayObj[provider]);
+                        const difference = parseFloat((rateToday - rateYesterday).toFixed(2))
+                        let status = 'same';
+                        if (rateToday > rateYesterday) {
+                          status = 'up';
+                        } else if (rateToday < rateYesterday) {
+                          status = 'down';
+                        }
+                        rates.push({
+                          provider,
+                          rateToday,
+                          rateYesterday,
+                          status,
+                          difference
+                        });
+                      });
+                      return {
+                        company: obj.company,
+                        rates
+                      };
+                    })
+                  };
+                  const data = [
+                    ...comp.viapulsa.map(obj => ({
+                        company: obj.company,
+                        rates: obj.rates
+                    })),
+                    ...comp.bypulsa.map(obj => ({
+                        company: obj.company,
+                        rates: obj.rates
+                    }))
+                ];
+                  
+                  res.status(200).json({ success: true, data });
+                });
+              });
+        });
     });
 });
-
 
 
 // const express = require('express');
