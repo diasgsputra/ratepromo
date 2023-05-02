@@ -47,6 +47,14 @@ app.get('/promo', (req, res) => {
         if (err) {
             return res.status(500).json({ message: 'Ada kesalahan', error: err });
         }
+        // modify the createdAt property of each row
+        rows = rows.map(row => {
+          const startDate = new Date(row.startDate);
+          const formattedStartDate = startDate.toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour12: false });
+          const endDate = new Date(row.endDate);
+          const formattedEndDate = endDate.toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour12: false });
+          return { ...row, startDate: formattedStartDate, endDate: formattedEndDate };
+        });
 
         res.status(200).json({ success: true, data: rows });
     });
@@ -84,7 +92,7 @@ app.post('/rate', (req, res) => {
 
 
 // read data / get data
-app.get('/rate', (req, res) => {
+app.get('/rate', async(req, res) => {
     const queryViapulsaYesterday = 'SELECT * FROM rate WHERE company = "VIA PULSA" AND DATE(createdAt) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) ORDER BY createdAt DESC LIMIT 1';
     const queryViapulsaToday = 'SELECT * FROM rate WHERE company = "VIA PULSA" ORDER BY createdAt DESC LIMIT 1';
 
