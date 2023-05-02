@@ -61,7 +61,7 @@ app.get('/promo', (req, res) => {
 });
 
 app.get('/cek-expired-promo', (req, res) => {
-    const querySql = 'UPDATE promo_provider SET isActive=0 WHERE endDate < now()';
+    const querySql = 'UPDATE promo_provider SET isActive=0 WHERE endDate < now() AND provider != indosat';
 
     koneksi.query(querySql, (err, rows, field) => {
         if (err) {
