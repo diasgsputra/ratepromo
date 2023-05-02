@@ -41,7 +41,7 @@ app.post('/promo', (req, res) => {
 
 // read data / get data
 app.get('/promo', (req, res) => {
-    const querySql = 'SELECT * FROM promo_provider WHERE isActive = 1';
+    const querySql = 'SELECT * FROM promo_provider WHERE isActive = 1 SORT BY provider DESC';
 
     koneksi.query(querySql, (err, rows, field) => {
         if (err) {
