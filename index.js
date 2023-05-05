@@ -140,11 +140,11 @@ app.get('/rate', async(req, res) => {
                           if (err) {
                             return res.status(500).json({ message: 'Ada kesalahan', error: err });
                           }
-                          koneksi.query(queryZahraYesterday, (err, rowsZahraYesterday, fieldToday) => {
+                          koneksi.query(queryTentraYesterday, (err, rowsTentraYesterday, fieldToday) => {
                             if (err) {
                               return res.status(500).json({ message: 'Ada kesalahan', error: err });
                             }
-                            koneksi.query(queryZahraToday, (err, rowsZahraToday, fieldToday) => {
+                            koneksi.query(queryTentraToday, (err, rowsTentraToday, fieldToday) => {
                               if (err) {
                                 return res.status(500).json({ message: 'Ada kesalahan', error: err });
                               }
