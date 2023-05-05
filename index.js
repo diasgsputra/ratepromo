@@ -108,8 +108,8 @@ app.get('/rate', async(req, res) => {
     const queryTentraYesterday = 'SELECT * FROM rate WHERE company = "TENTRA PULSA" AND DATE(createdAt) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) ORDER BY createdAt DESC LIMIT 1';
     const queryTentraToday = 'SELECT * FROM rate WHERE company = "TENTRA PULSA" ORDER BY createdAt DESC LIMIT 1';
 
-    const queryConversaYesterday = 'SELECT * FROM rate WHERE company = "CONVERSA PULSA" AND DATE(createdAt) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) ORDER BY createdAt DESC LIMIT 1';
-    const queryConversaToday = 'SELECT * FROM rate WHERE company = "CONVERSA PULSA" ORDER BY createdAt DESC LIMIT 1';
+    const queryConversaYesterday = 'SELECT * FROM rate WHERE company = "CONVERSA" AND DATE(createdAt) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) ORDER BY createdAt DESC LIMIT 1';
+    const queryConversaToday = 'SELECT * FROM rate WHERE company = "CONVERSA" ORDER BY createdAt DESC LIMIT 1';
     koneksi.query(queryViapulsaYesterday, (err, rowsViaPulsaYesterday, field) => {
         if (err) {
             return res.status(500).json({ message: 'Ada kesalahan', error: err });
