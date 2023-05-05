@@ -102,6 +102,9 @@ app.get('/rate', async(req, res) => {
     const querySukmaYesterday = 'SELECT * FROM rate WHERE company = "SUKMA CONVERT" AND DATE(createdAt) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) ORDER BY createdAt DESC LIMIT 1';
     const querySukmaToday = 'SELECT * FROM rate WHERE company = "SUKMA CONVERT" ORDER BY createdAt DESC LIMIT 1';
     
+    const queryZahraYesterday = 'SELECT * FROM rate WHERE company = "ZAHRA CONVERT" AND DATE(createdAt) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) ORDER BY createdAt DESC LIMIT 1';
+    const queryZahraToday = 'SELECT * FROM rate WHERE company = "ZAHRA CONVERT" ORDER BY createdAt DESC LIMIT 1';
+
     koneksi.query(queryViapulsaYesterday, (err, rowsViaPulsaYesterday, field) => {
         if (err) {
             return res.status(500).json({ message: 'Ada kesalahan', error: err });
