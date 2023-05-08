@@ -60,6 +60,28 @@ app.get('/promo', (req, res) => {
     });
 });
 
+// read data / get data
+app.get('/promo', (req, res) => {
+  const provider = req.query.provider;
+  const querySql = 'SELECT * FROM promo_provider WHERE isActive = 1 ORDER BY endDate ASC';
+
+  koneksi.query(querySql, [provider],(err, rows, field) => {
+      if (err) {
+          return res.status(500).json({ message: 'Ada kesalahan', error: err });
+      }
+      // modify the createdAt property of each row
+      rows = rows.map(row => {
+        const startDate = new Date(row.startDate);
+        const formattedStartDate = startDate.toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour12: false });
+        const endDate = new Date(row.endDate);
+        const formattedEndDate = endDate.toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour12: false });
+        return { ...row, startDate: formattedStartDate, endDate: formattedEndDate };
+      });
+
+      res.status(200).json({ success: true, data: rows });
+  });
+});
+
 app.get('/cek-expired-promo', (req, res) => {
     const querySql = 'UPDATE promo_provider SET isActive=0 WHERE endDate < now() AND provider != "indosat"';
 
