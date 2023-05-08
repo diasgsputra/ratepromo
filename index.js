@@ -40,7 +40,7 @@ app.post('/promo', (req, res) => {
 
 
 // read data / get data
-app.get('/promo-provider', (req, res) => {
+app.get('/promo', (req, res) => {
     const querySql = 'SELECT * FROM promo_provider WHERE isActive = 1 ORDER BY endDate ASC';
 
     koneksi.query(querySql, (err, rows, field) => {
@@ -61,7 +61,7 @@ app.get('/promo-provider', (req, res) => {
 });
 
 // read data / get data
-app.get('/promo', (req, res) => {
+app.get('/promo-provider', (req, res) => {
   const provider = req.query.provider;
   const querySql = 'SELECT * FROM promo_provider WHERE isActive = 1 ORDER BY endDate ASC';
 
