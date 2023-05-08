@@ -61,7 +61,7 @@ app.get('/promo', (req, res) => {
 });
 
 // read data / get data
-app.get('/promo', (req, res) => {
+app.get('/promo-provider', (req, res) => {
   const provider = req.query.provider;
   const querySql = 'SELECT * FROM promo_provider WHERE isActive = 1 AND provider = ? ORDER BY endDate ASC';
 
